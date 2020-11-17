@@ -42,10 +42,8 @@ class LSC():
         transparent boundaries
     interfaces: list
         transparent boundaries at the interfaces between volumes
-    bundles_initial: list
-        bundles with their characteristics upon entering
-    bundles_final: list
-        bundles with their end characteristics
+    bundles: list
+        List of all bundles run through simulation
     nphoton: int
         number of incident photons
     optical_efficiency: float
@@ -90,17 +88,10 @@ class LSC():
     
     Notes
     -----
-    This should renamed to just LSC instead of LSC_total
-    
     The terminology "gateways" should be replaced by "transparent_bdys"
     
-    The arguments that pass into "main" ought to pass directly into
-    LSC_total()
-    
-    for loops should be rewritten using cleaner syntax I think:
-        replace "for gateway in range(0,len(self.gateways))"
-        with    "for gateway in gateways"
-    
+    The arguments that pass into "main" should pass directly into
+    LSC_total()    
     """
   
     def __init__(self):
@@ -115,8 +106,7 @@ class LSC():
             
         Notes
         -----
-        This should be reformatted - inputs to "main" should be here and I
-        think zero values should go away.
+        This should be reformatted - inputs to "main" should be here.
         """
         
         self.vol_list = []
@@ -124,8 +114,7 @@ class LSC():
         self.pv_boundaries = []
         self.gateways = []
         self.interfaces = []
-        self.bundles_initial = []
-        self.bundles_final = []
+        self.bundles = []
         self.nphoton = 0 
         self.optical_efficiency = 0
         self.Isc_cell = 0
@@ -160,11 +149,8 @@ class LSC():
         
         Notes
         -----
-        I don't think I should set class attributes within this method, they
+        Class attributes should not be set within this method, they
         should be returned by the function and set in the __init__ method.
-        
-        the for loops in this method need to be rewritten with cleaner syntax,
-        they are difficult to understand and could be more efficient.
         """
 
         # separate gateways and pv boundaries into distinct lists
@@ -326,11 +312,7 @@ class LSC():
         automatically based on the selected boundary where light enters
         
         emi_xenon and emi_xenon_max should be renamed because they are not
-        just limited to xenon. "emi_xenon_max" should be calculated not manual.
-        
-        Binning process should work, but has not been fully tested.
-        
-        Bundles_initial and Bundles_final are broken
+        just limited to xenon.
         """
         
         self.simulations = simulations
@@ -362,7 +344,7 @@ class LSC():
             
             # capture characteristics of initial bundle
             self.wave_len_log.append(bundle.wave_len)
-            self.bundles_initial.append(bundle)            
+            self.bundles.append(bundle)            
             self.bare_photon_flux(bundle)                
             self.nphoton += lsc.photon_generation(bundle.wave_len,
                                                   bundle.energy)
@@ -383,7 +365,6 @@ class LSC():
                 if vol_identifier != index:
                     vol_identifier = index
                 if bundle.reset == 1:
-                    self.bundles_final.append(bundle)
                     break
         
         # determine LSC spectral modifier factor, m
@@ -503,21 +484,9 @@ class LSC():
         
         Notes
         -----
-        Input parameter should be self.bundles_initial
+        This should be moved into lsc_functions
         """
  
-        # wave_len_log.rename(columns = {wave_len_log.columns[0]:'wave_len'},
-        #                     inplace = True)
-        # #wave_len_log = pd.DataFrame({'wave_len':wave_len_log})
-        # cut_bins = np.linspace(0,1300,1301)
-        # wave_len_log['cut_bins'] = pd.cut(wave_len_log['wave_len'],
-        #                                   bins=cut_bins)
-        # wave_len_log['nphoton'] = wave_len_log['wave_len'].apply(
-        #                             lambda x: lsc.photon_generation(x, energy))
-        # photon_count = wave_len_log.groupby('cut_bins')['nphoton'].sum()
-        # photon_count = photon_count.fillna(0)
-        # norm_photon_count = photon_count/max(photon_count)
-        # wave_len_log = pd.DataFrame(wave_len_log)
         cut_bins = np.linspace(0,1300,326)
         bundle_counts = (
             pd.cut(wave_len_log[0], bins=cut_bins).value_counts(sort = False))
@@ -587,8 +556,6 @@ class Volume(LSC):
         
     Notes
     -----
-    "Volume" should be renamed "Perfect_Volume".
-    
     Get rid of the use of "i" and "j" and replace with more descriptive
     variables "bdy" and "vol".
     
@@ -638,11 +605,11 @@ class Volume(LSC):
         index: int
             Indicates the index of the volume that a bundle will enter next,
             it could remain in the same volume or go to an adjacent volume if
-            it hits a Translucent boundary.
+            it hits a TransparentBoundary.
             
         Notes
         -----
-        I'm not sure "bundle.reset" is a good parameter to return. First,
+        "bundle.reset" is not the best parameter to return. First,
         return "reset" and then add to a bundle in the output.
     
         Replace reset with True/False eventually
@@ -701,9 +668,6 @@ class Volume(LSC):
         
         Notes
         -----
-        Remove the use of "distance" in this function. It has no purpose right
-        now aside from being a rudimentary way to allow for similar inputs
-        between volumes. There must be a better way.
         """
         
         self.LSC[j].boundary_intersect_count += 1
@@ -779,10 +743,7 @@ class AbsorbingVolume(Volume):
         or absorbed by a collection surface.
 
     Notes
-    -----
-    Many of the variables in this class are inherited from the Volume class,
-    I'm not sure if I'm describing this in the docstring properly.
-    
+    -----  
     Get rid of the use of "i" and "j" and replace with more descriptive
     variables "bdy" and "vol".
     
@@ -922,10 +883,7 @@ class ParticleVolume(AbsorbingVolume):
 
 
     Notes
-    -----
-    Many of the variables in this class are inherited from the Volume class,
-    I'm not sure if I'm describing this in the docstring properly.
-    
+    ----- 
     Get rid of the use of "i" and "j" and replace with more descriptive
     variables "bdy" and "vol".
     
@@ -1104,7 +1062,6 @@ class Boundary(Volume):
         
     Notes
     -----
-    There must be a dunder method to replace the class_type function
     """
 
     def __init__(self, polygon, volume):
@@ -1144,10 +1101,7 @@ class Boundary(Volume):
             
         Notes
         -----
-        More inputs could be placed into this function to be more descriptive
-        
-        The logic here may not be completely tight. There are occasional
-        intersection points that cannot be found across all boundaries.
+        More inputs could be placed into this function to be more descriptive.
         """
         
         # find possible intersect with line-plane intersection calculations
@@ -1264,8 +1218,6 @@ class Boundary(Volume):
             
         Notes
         -----
-        This feels like a rudimentary way to do this. There might be something
-        more elegant to try here.
         """
 
         if cls_type == "Boundary":
@@ -1282,9 +1234,9 @@ class TransparentBoundary(Boundary):
     to find bundle intersection and bundle direction.
     
     The TransparentBoundary class is unique in that it will allow for bundle
-    transmittance. The entrance boundary of an LSC must be a Translucent_Bdy if
-    a bundle is expected to move beyond the first boundary, and any interfaces
-    between volumes must be Translucent_Bdys.
+    transmittance. The entrance boundary of an LSC must be a
+    TransparentBoundary if a bundle is expected to move beyond the first
+    boundary, and any interfaces between volumes must be TransparentBoundarys.
 
     ...
 
@@ -1332,7 +1284,7 @@ class TransparentBoundary(Boundary):
         remain in the same volume. Finds bundle trajectory upon entrance to a
         new boundary or reflection within the same boundary.
     boundary_interaction(bundle)
-        Determines if a bundle will leave a boundary. For a Translucent_bdy
+        Determines if a bundle will leave a boundary. For a TransparentBoundary
         this is always true.
     class_type(cls_type)
         Used alongside the matching_pairs function to distinguish this type
@@ -1345,14 +1297,8 @@ class TransparentBoundary(Boundary):
         intersect.    
     
     Notes
-    -----
-    The behavior being modeled here isn't actually "Translucent". Naming should
-    be replaced with "Transparent", and a subsequent class could model a
-    Translucent interface.
-    
+    ----- 
     matchingcenter attribute should be removed throughout the code.
-    
-    There must be a dunder method to replace the class_type function
     """
     
     # initalize same properties as boundary class, with a few added counters
@@ -1605,7 +1551,7 @@ class OpaqueBoundary(Boundary):
              wave_len_min, wave_len_max)
         Initializes boundary attributes
     boundary_interaction(bundle)
-        Determines if a bundle will leave a boundary. For an Opaque_Bdy,
+        Determines if a bundle will leave a boundary. For an OpaqueBoundary,
         bundles can be absorbed or reflected.
     find_direction(bundle)
         Determine trajectory of a bundle as it leaves a boundary
@@ -1619,7 +1565,6 @@ class OpaqueBoundary(Boundary):
         
     Notes
     -----
-    There must be a dunder method to replace the class_type function
     """
     
     def __init__(self, polygon, volume, surface_type,
@@ -1633,7 +1578,7 @@ class OpaqueBoundary(Boundary):
 
     def boundary_interaction(self, bundle):
         """Determine trajectory of a bundle as it leaves a boundary. For an
-        Opaque_Bdy, a bundle can be reflected specularly or diffusely.
+        OpaqueBoundary, a bundle can be reflected specularly or diffusely.
         
         Parameters
         ----------
@@ -1672,7 +1617,7 @@ class OpaqueBoundary(Boundary):
 
     def find_direction(self, bundle):
         """Determine trajectory of a bundle as it leaves a boundary. For an
-        Opaque_Bdy, a bundle can be reflected specularly or diffusely.
+        OpaqueBoundary, a bundle can be reflected specularly or diffusely.
                 
         Parameters
         ----------
@@ -1695,9 +1640,7 @@ class OpaqueBoundary(Boundary):
             is refreshed to ensure the bundle stays within the same volume.
         
         Notes
-        -----
-        It seems like reset and index are redundant and could be removed.
-        
+        -----    
         More inputs could be placed into this function to be more descriptive.
         """
         
@@ -1736,8 +1679,6 @@ class OpaqueBoundary(Boundary):
             
         Notes
         -----
-        This feels like a rudimentary way to do this. There might be something
-        more elegant to try here.
         """
 
         if cls_type == "Boundary":
@@ -1815,7 +1756,7 @@ class PVBoundary(OpaqueBoundary):
              wave_len_min, wave_len_max)
         Initializes boundary attributes
     boundary_interaction(bundle)
-        Determines if a bundle will leave a boundary. For an Opaque_Bdy,
+        Determines if a bundle will leave a boundary. For an OpaqueBoundary,
         bundles can be absorbed or reflected.
     class_type(cls_type)
         Used alongside the matching_pairs function to distinguish this type
@@ -1828,7 +1769,6 @@ class PVBoundary(OpaqueBoundary):
         
     Notes
     -----
-    There must be a dunder method to replace the class_type function
     """
     
     def __init__(self, polygon, volume, surface_type, EQE, IQE=0,
@@ -1867,9 +1807,6 @@ class PVBoundary(OpaqueBoundary):
         Notes
         -----
         More inputs could be placed into this function to be more descriptive.
-        
-        wave_len_log is in the right spot for the purposes of the paper, but
-        not in a good spot over the long term.
         """
         
         reset = 0
@@ -1936,8 +1873,6 @@ class PVBoundary(OpaqueBoundary):
             
         Notes
         -----
-        This feels like a rudimentary way to do this. There might be something
-        more elegant to try here.
         """
     
         if cls_type == "PV":
@@ -2019,10 +1954,6 @@ class Bundle():
     
     Notes
     -----
-    This would need to be modified to handle more than one matrix material
-    
-    "spectrum_max" should be automated and not an input
-    
     """
     
     def __init__(self, theta, phi, I, spectrum, spectrum_max, p_o,
@@ -2098,10 +2029,6 @@ class Particle():
 
     Notes
     -----
-    "emission_spect_max" should be automated and not an input
-    
-    poa should be renamed, because POA is a standard industry term for plane-of
-    -array irradiance.
     """
     
     def __init__(self, poa, extinction, wave_len_min, wave_len_max, qe,
@@ -2146,9 +2073,7 @@ class Particle():
         -----
         bundle_emission is a bit confusing. Instead of this being 1 or 0, it
         should be True/False and the bundle_fate function in the scattering 
-        volume class should be modified accordingly.
-        
-        "probability" should be renamed to something more descriptive    
+        volume class should be modified accordingly.  
         """
 
         reset = 0

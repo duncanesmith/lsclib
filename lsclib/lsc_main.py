@@ -57,20 +57,13 @@ def LSC_wedge_main(simulations, Einc = 451.313, light_form = 'direct',
     Having this written as one large script might not be the best. There are
     a large variety of inputs, so, instead of inputting them all here, these
     could be inputs to particular functions that make up "lsc_main". This would
-    also demonstrate that a user is not limited to just the configuration
+    also demonstrate that a user is not limited to only the configuration
     detailed in the main script shown here.
-    
-    Images should be added within the code to visualize more easily.
     
     Phosphor particle should be added before iterating through incidence angle
     combinations.
     
-    theta_o and phi_o adjustments feel awkward. Phi should start in the right
-    coordinates, and theta_o could be adjusted outside of main sim possibly.
-    
     Starting volume/boundary process shoud be improved.
-    
-    Inputs to LSC_main() should be input into LSC_total()
     
     errorcounts should be replaced by a for loop that runs automatically
     """

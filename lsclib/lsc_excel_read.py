@@ -12,30 +12,6 @@ from scipy.interpolate import UnivariateSpline
 from sklearn.metrics import mean_squared_error, r2_score
 
 
-def LSC_excel_read():
-
-    # read silicone matrix absorption spectrum data from excel
-    abs_silicone = pd.read_excel('absorption_silicone.xlsx')
-    abs_silicone = abs_silicone.values  # convert dataframe to array using numpy
-    
-    # read pv absorption spectrum data from excel
-    abs_pv = pd.read_excel('absorption_pv.xlsx')
-    abs_pv = abs_pv.values  # convert dataframe to array using numpy
-
-    # read xenon emission spectrum data from excel
-    emi_xenon = pd.read_excel('emission_xenon.xlsx')
-    emi_xenon = emi_xenon.values  # convert dataframe to array using numpy
-    
-    # read phosphor absorption spectrum data from excel
-    abs_phosphor = pd.read_excel('absorption_phosphor.xlsx')
-    abs_phosphor = abs_phosphor.values
-    
-    # read phosphor emission spectrum data from excel
-    emi_phosphor = pd.read_excel('emission_phosphor.xlsx')
-    emi_phosphor = emi_phosphor.values # convert dataframe to array using numpy
-    
-    return abs_silicone, abs_pv, emi_xenon, abs_phosphor, emi_phosphor
-
 def LSC_excel_read_spl():
 
     # read silicone matrix absorption spectrum data from excel

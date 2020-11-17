@@ -73,9 +73,6 @@ def pathlength_matrix(wave_len, wave_len_min, wave_len_max, absorption):
     
     Notes
     -----
-    Make sure this can take an equation as an input
-    
-    Provide link describing application of Bouger's law in this context
     """
 
     if type(absorption) is float:
@@ -115,10 +112,6 @@ def surface_absorption(wave_len, wave_len_min, wave_len_max, abs_surface):
     
     Notes
     -----
-    Make sure this can take an equation as an input
-    
-    This should be able to handle a float input too
-    
     surface_absorption should be renamed to boundary_absorption
     """
 
@@ -150,7 +143,6 @@ def refracted_vect(n_i, n_f, vect):
     
     Notes
     -----
-    Provide link describing Snell's law here.
     """
 
     [theta, phi] = cart2sph(vect)
@@ -322,7 +314,6 @@ def bundle_reflection(surface_type, vect, tilt, n):
 
     Notes
     -----
-    It seems like the print statement here is unnecessary
     """
 
     if surface_type == 'specular':
@@ -374,7 +365,6 @@ def bundle_refraction(surface_type, refracted_vect, tilt, n):
 
     Notes
     -----
-    Does diffuse refraction even exist? Might be worth removing.
     """
 
 
@@ -483,9 +473,6 @@ def refracted_vect_flip(n, bdy_center, n_max, p_o, p_i, vect):
     -----
     This is set up with the assumption that the exterior is air, this is fine,
     but not the most elegant
-    
-    The logic shown here might be fragile. I'm not sure how well this will
-    hold up for more sophisticated geometries.
     """
     
     # find point on the normal that is very far away

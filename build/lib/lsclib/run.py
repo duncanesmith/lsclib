@@ -8,22 +8,22 @@ Created on Mon Mar 11 16:14:00 2019
 
 import math
 import time
-import lsc_excel_read as lscread
+import xls_read_interpolate as xlsread
 import lsc_classes as lsccls
 import cProfile, pstats
-import lsc_external_equations as lsceqn
+import external_equations as eqn
 import pandas as pd
 
-def LSC_wedge_main(simulations, Einc = 451.313, light_form = 'direct',
+def wedge(trials, Einc = 451.313, light_form = 'direct',
                    results = 'single', theta_o = .000001, phi_o = .000001):
-    """Set up geometry to run simulations for a wedge-shaped LSC. Specify
+    """Set up geometry to run trials for a wedge-shaped LSC. Specify
     vertices that make up the LSC. Each vertice will belong to a boundary and
     each boundary will belong to a volume. Using the LSC classes that have
     been defined, attribute characteristics to each boundary and volume.
 
     Parameters
     ----------
-    simulations : int
+    trials : int
         Indicate number of bundles that will be used for the program
     Einc : float
         Indicates incident irradiance on the LSC. Default is 451.313 based upon
@@ -105,15 +105,15 @@ def LSC_wedge_main(simulations, Einc = 451.313, light_form = 'direct',
     H = Height
     
     # read in various excel data tables
-    [abs_silicone, EQE_pv, IQE_pv, emi_xenon,
-     abs_phosphor, emi_phosphor] = lscread.LSC_excel_read_spl()
-    EQE_pv, EQE_pv_max = lscread.spline(EQE_pv, 0)
-    IQE_pv, IQE_pv_max = lscread.spline(IQE_pv, 0)
-    emi_xenon, emi_xenon_max = lscread.spline(emi_xenon, 0)
-    abs_phosphor, abs_phosphor_max = lscread.spline(abs_phosphor, 0)
-    emi_phosphor, emi_phosphor_max = lscread.spline(emi_phosphor, 0)
+    [abs_matrix, EQE_pv, IQE_pv, emi_source,
+     abs_particle, emi_particle] = xlsread.excel_read()
+    EQE_pv, EQE_pv_max = xlsread.spline(EQE_pv)
+    IQE_pv, IQE_pv_max = xlsread.spline(IQE_pv)
+    emi_source, emi_source_max = xlsread.spline(emi_source)
+    abs_particle, abs_particle_max = xlsread.spline(abs_particle)
+    emi_particle, emi_particle_max = xlsread.spline(emi_particle)
     
-    # establish phosphor particle characteristics
+    # establish particle characteristics
     wave_len_min = 270  # minimum wavelength that can be absorbed by a particle
     wave_len_max = 500  # maximum wavelength that can be absorbed by a particle
     qe = 0.75           # quantum efficiency of a particle
@@ -121,11 +121,11 @@ def LSC_wedge_main(simulations, Einc = 451.313, light_form = 'direct',
     extinction = 4240   # extinction coefficient (42.4 cm^-1)
     
     
-    # establish silicone characteristics
-    IoR = lsceqn.IoR_Sellmeier    # set index of refraction as constant or eqn
-    abs_silicone, abs_silicone_max = lscread.spline(abs_silicone, 0)
-    wave_len_min_silicone = 229   # minimum wavelength absorbed by silicone
-    wave_len_max_silicone = 1100  # maximum wavelength absorbed by silicone
+    # establish matrix characteristics
+    IoR = eqn.IoR_Sellmeier    # set index of refraction as constant or eqn
+    abs_matrix, abs_matrix_max = xlsread.spline(abs_matrix)
+    wave_len_min_matrix = 229   # minimum wavelength absorbed by matrix
+    wave_len_max_matrix = 1100  # maximum wavelength absorbed by matrix
     
     
     # establish solar cell characteristics
@@ -150,7 +150,7 @@ def LSC_wedge_main(simulations, Einc = 451.313, light_form = 'direct',
         theta_loop_count = len(df.index)
         phi_loop_count = len(df.columns)
     
-    # if expecting just one run for LSC_efficiency
+    # if expecting just one combination of inputs
     if results == 'single':
         
         theta_loop_count = 1
@@ -163,8 +163,8 @@ def LSC_wedge_main(simulations, Einc = 451.313, light_form = 'direct',
             
             # add phosphor particle
             particle = lsccls.Particle(poa, extinction, wave_len_min,
-                                       wave_len_max, qe, abs_phosphor,
-                                       emi_phosphor, emi_phosphor_max)
+                                       wave_len_max, qe, abs_particle,
+                                       emi_particle, emi_particle_max)
             
             # define dimensions/characteristics of Volume 0 - mirror gap
                         
@@ -178,9 +178,9 @@ def LSC_wedge_main(simulations, Einc = 451.313, light_form = 'direct',
             bdys0 = [bdy0a, bdy0b, bdy0c, bdy0d, bdy0e, bdy0f]
              
             lsc.vol_list.append(lsccls.AbsorbingVolume(bdys0, 0, lsc, IoR,
-                                                       abs_silicone,
-                                                       wave_len_min_silicone,
-                                                       wave_len_max_silicone))
+                                                       abs_matrix,
+                                                       wave_len_min_matrix,
+                                                       wave_len_max_matrix))
             # add bottom surface
             lsc[0].bdy_list.append(lsccls.OpaqueBoundary(bdys0[0], lsc[0],
                                                          'specular', .05))
@@ -214,9 +214,9 @@ def LSC_wedge_main(simulations, Einc = 451.313, light_form = 'direct',
             bdys1 = [bdy1a, bdy1b, bdy1c, bdy1d, bdy1e, bdy1f]
             
             lsc.vol_list.append(lsccls.ParticleVolume(bdys1, 1, lsc, IoR,
-                                                      abs_silicone, particle,
-                                                      wave_len_min_silicone,
-                                                      wave_len_max_silicone))
+                                                      abs_matrix, particle,
+                                                      wave_len_min_matrix,
+                                                      wave_len_max_matrix))
             # add bottom surface
             lsc[1].bdy_list.append(lsccls.OpaqueBoundary(bdys1[0], lsc[1],
                                                          'specular', .05))
@@ -247,9 +247,9 @@ def LSC_wedge_main(simulations, Einc = 451.313, light_form = 'direct',
             
             # define volume
             lsc.vol_list.append(lsccls.AbsorbingVolume(bdys2, 2, lsc, IoR,
-                                                       abs_silicone,
-                                                       wave_len_min_silicone,
-                                                       wave_len_max_silicone))
+                                                       abs_matrix,
+                                                       wave_len_min_matrix,
+                                                       wave_len_max_matrix))
             # add interface with mirror gap and phosphor film
             lsc[2].bdy_list.append(lsccls.TransparentBoundary(bdys2[0],
                                                               lsc[2]))
@@ -280,15 +280,15 @@ def LSC_wedge_main(simulations, Einc = 451.313, light_form = 'direct',
             theta_o = math.radians(theta_o + 180)  # adjust theta to head down
             phi_o = math.radians(phi_o + 90)       # adjust phi
             
-            # Run LSC simulations, determining fate of every bundle
+            # Run LSC trials, determining fate of every bundle
             starting_vol = len(lsc) - 1
             starting_bdy = 2
             
-            lsc.main(simulations, L, W, H, light_form, theta_o,
+            lsc.main(trials, L, W, H, light_form, theta_o,
                      phi_o, starting_vol, starting_bdy, I,
-                     emi_xenon, emi_xenon_max, particle)
+                     emi_source, emi_source_max, particle)
             
-            # Process data outputs from all LSC simulations
+            # Process data outputs from all LSC trials
             
             # determine if all bundles in volume 0 are accounted for
             errorcount0 = (lsc[0].bundles_absorbed +
@@ -324,7 +324,7 @@ def LSC_wedge_main(simulations, Einc = 451.313, light_form = 'direct',
                            lsc[2][4].bundles_absorbed +
                            lsc[2][5].bundles_absorbed)
         
-            error = (errorcount0 + errorcount1 + errorcount2)/simulations
+            error = (errorcount0 + errorcount1 + errorcount2)/trials
         
             if error != 1:
                 print("\nENERGY IS NOT CONSERVED!!!!!")

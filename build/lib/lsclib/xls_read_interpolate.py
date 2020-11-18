@@ -9,7 +9,7 @@ import numpy as np
 from scipy.interpolate import InterpolatedUnivariateSpline
 
 
-def LSC_excel_read_spl():
+def excel_read():
 
     # read silicone matrix absorption spectrum data from excel
     abs_matrix = pd.read_excel('absorption_matrix.xlsx')

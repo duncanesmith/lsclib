@@ -4,14 +4,24 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="example-pkg-duncanesmith", # Replace with your own username
+    name="lsclib", # Replace with your own username
     version="0.0.1",
-    author="Example Author",
-    author_email="author@example.com",
-    description="A small example package",
-    long_description=long_description,
+    author="Duncan E. Smith",
+    author_email="smithd24@rpi.edu",
+    description=("Library for evaluating the performance of LSCs"),
+    long_description="""
+    lsclib is a python-based repository hosted on GitHub that employs the 
+    Monte Carlo ray-tracing method of radiative transport to effectively model
+    LSCs.lsclib hopes to short-circuit (pun-intended)the learning curve
+    associated breaking into the field, and present results in both an academic
+    and commercial context. This repository will continue to become more
+    sophisticated, but for now relies heavily upon the paper submitted for
+    publishing entitled "An open-source Monte Carlo ray-trace simulation tool
+    for luminescent solar concentrators with validation studies employing
+    scattering phosphor films."
+    """,
     long_description_content_type="text/markdown",
-    url="https://github.com/pypa/sampleproject",
+    url="https://github.com/duncanesmith/lsclib",
     packages=setuptools.find_packages(),
     classifiers=[
         "Development Status :: 3 - Alpha",

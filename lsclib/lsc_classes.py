@@ -12,8 +12,8 @@ from inspect import isfunction
 import pandas as pd
 
 # import LSC specific functions
-import lsc_functions as lsc  # import lsc calcs
-import phosphor_module as pm      # import phosphor calcs
+import lsc_calcs as lc  # import lsc calcs
+import particle_calcs as pc      # import phosphor calcs
 
 # import transformation functions
 import rotations as rm                           # coord rotations
@@ -57,7 +57,7 @@ class LSC():
         spectral mismatch factor for the LSC. Normalized photon flux incident
         on pv boundaries divided by normalized photon flux incident on the
         LSC entrance boundary
-    simulations: int
+    trials: int
         number of bundles
     norm_inc_spectrum: DataFrame
         normalized incident light spectrum on LSC
@@ -75,7 +75,7 @@ class LSC():
     matching_pairs()
         groups together similar boundaries. Finds gateways (transparent
         boundaries), interfaces, and pv boundaries.
-    main(simulations, L, W, H, light_form, theta_o, phi_o, starting_vol,
+    main(trials, L, W, H, light_form, theta_o, phi_o, starting_vol,
          starting_bdy, I, emi_xenon, emi_xenon_max, particle)
         Processes bundle movement between volumes and calculates a variety of
         LSC attributes based upon bundle fates (simulation results)
@@ -197,10 +197,10 @@ class LSC():
 
             for potmatch in range(0, len(self.gateways)):
                 gateway_potmatch = self.gateways[potmatch]
-                nn_angle = lsc.incidence_angle(gateway_test.n,
+                nn_angle = lc.incidence_angle(gateway_test.n,
                                               gateway_potmatch.n)
                 cc_line = gateway_test.center - gateway_potmatch.center
-                ccn_angle = lsc.incidence_angle(cc_line,gateway_potmatch.n)
+                ccn_angle = lc.incidence_angle(cc_line,gateway_potmatch.n)
                 
                 # if gateways exist on the same plane with opposite normals,
                 # check to see if they overlap
@@ -258,14 +258,14 @@ class LSC():
                             self.gateways[gateway].matchingcenter = (
                                                 self.gateways[gateway].center)
 
-    def main(self, simulations, L, W, H, light_form, theta_o, phi_o,
+    def main(self, trials, L, W, H, light_form, theta_o, phi_o,
              starting_vol, starting_bdy, I, emi_xenon, emi_xenon_max, particle):
         """Processes bundle movement between volumes and calculates a variety
         of LSC attributes based upon bundle fates (simulation results)
         
         Parameters
         ----------
-        simulations: int
+        trials: int
             Number of bundles
         L: float
             Length of the boundary where light enters
@@ -315,11 +315,11 @@ class LSC():
         just limited to xenon.
         """
         
-        self.simulations = simulations
+        self.trials = trials
         self.wave_len_log = []
         self.wave_len_log_pv = []
         
-        for sim in range(0, simulations):
+        for sim in range(0, trials):
             # initialize bundle location
             incx = random.uniform(0, W)  # begin at center of x        
             # for top
@@ -346,7 +346,7 @@ class LSC():
             self.wave_len_log.append(bundle.wave_len)
             self.bundles.append(bundle)            
             self.bare_photon_flux(bundle)                
-            self.nphoton += lsc.photon_generation(bundle.wave_len,
+            self.nphoton += lc.photon_generation(bundle.wave_len,
                                                   bundle.energy)
             
             # determine direction bundle will be heading initially
@@ -400,7 +400,7 @@ class LSC():
             energy_cell[pv] = (
                 bundle.energy*self.pv_boundaries[pv].bundles_absorbed)
             flux_cell_norm = self.pv_boundaries[pv].nphoton/energy_cell[pv]
-            energy_i = bundle.energy*simulations
+            energy_i = bundle.energy*trials
             flux_bare_norm[pv] = (
                 self.pv_boundaries[pv].nphoton_bare/energy_i)
             
@@ -457,18 +457,18 @@ class LSC():
             converted = 0
             
             if type(self.pv_boundaries[pv].EQE) is float:
-                converted = lsc.surface_efficiency(self.pv_boundaries[pv].EQE)
+                converted = lc.surface_efficiency(self.pv_boundaries[pv].EQE)
             else:
-                probability = lsc.surface_absorption(
+                probability = lc.surface_absorption(
                     bundle.wave_len,
                     self.pv_boundaries[pv].wave_len_min,
                     self.pv_boundaries[pv].wave_len_max,
                     self.pv_boundaries[pv].EQE)
-                converted = lsc.surface_efficiency(probability)
+                converted = lc.surface_efficiency(probability)
             # Uses EQE to determine if photons will become electricity
             if converted == 1:
                 self.pv_boundaries[pv].nphoton_bare += (
-                    lsc.photon_generation(bundle.wave_len, bundle.energy))
+                    lc.photon_generation(bundle.wave_len, bundle.energy))
     
     def bdy_incident_spectrum(self, wave_len_log, energy):
         """finds normalized incident light spectrum on LSC by bucketing bundles
@@ -569,11 +569,11 @@ class Volume(LSC):
         self.index = index
         self.LSC = LSC
         self.IoR = IoR
-        [self.Lx, self.Ly, self.Lz] = lsc.find_vol_dimensions(bdy_points)
+        [self.Lx, self.Ly, self.Lz] = lc.find_vol_dimensions(bdy_points)
         self.bdy_list = []
         self.bundles_absorbed = 0
         self.boundary_intersect_count = 0
-        self.center = lsc.find_vol_center(bdy_points)
+        self.center = lc.find_vol_center(bdy_points)
 
     def __len__(self):
         return len(self.bdy_list)
@@ -982,13 +982,13 @@ class ParticleVolume(AbsorbingVolume):
                         if bundle.mag_trav == 0:
                             self.particle_emission_count += 1
                             bundle.particle_emission_count += 1
-                            bundle.pathlength = lsc.pathlength_matrix(
+                            bundle.pathlength = lc.pathlength_matrix(
                                             bundle.wave_len, self.wave_len_min,
                                             self.wave_len_max, self.absorption)
                         [bundle.theta, bundle.phi] = (
                                                 self.particle.find_direction())
                         bundle.p_o = bundle.p_i
-                        bundle.particle_pathlength = pm.pathlength(
+                        bundle.particle_pathlength = pc.pathlength(
                                                     self.particle.extinction)
                         break
                     
@@ -1067,10 +1067,10 @@ class Boundary(Volume):
     def __init__(self, polygon, volume):
         self.polygon = polygon
         self.volume = volume
-        self.center = lsc.find_bdy_center(polygon)
-        self.n = lsc.find_normal_vector(
+        self.center = lc.find_bdy_center(polygon)
+        self.n = lc.find_normal_vector(
                 self.polygon, self.center, volume.center)
-        self.tilt = lsc.tilt_angle(self.n)
+        self.tilt = lc.tilt_angle(self.n)
         self.polygon_for_check = rm.rot_poly(-self.tilt, self.polygon, self.n)
         self.bundles_absorbed = 0
         self.bundles = []
@@ -1151,7 +1151,7 @@ class Boundary(Volume):
 
             if testpoint.within(testpolygon):
                 if abs(t) > 1e-15:
-                    ray_check = lsc.incidence_angle(ray_direction, self.n)
+                    ray_check = lc.incidence_angle(ray_direction, self.n)
 
                     # if angle is negative find equivalent positive angle
                     if ray_check < 0:
@@ -1190,7 +1190,7 @@ class Boundary(Volume):
         """
         
         reset = 1
-        self.nphoton += lsc.photon_generation(bundle.wave_len, bundle.energy)
+        self.nphoton += lc.photon_generation(bundle.wave_len, bundle.energy)
         self.bundles_absorbed += 1
         self.bundles.append(bundle)
         
@@ -1379,12 +1379,12 @@ class TransparentBoundary(Boundary):
         vect = rm.rot(self.tilt, vect, self.n)
         [self.refracted_vect, index, indexmatch] = self.check_interface(
                                                             bundle, vect)
-        self.rho = lsc.reflectivity(vect, self.refracted_vect)
+        self.rho = lc.reflectivity(vect, self.refracted_vect)
 
         # find if a bundle is refracted or reflected and resulting trajectory
         [theta, phi, bundle_reflect_stay,
          bundle_reflect_lost, bundle_refract_lost] = (
-         lsc.refraction_or_reflection(self.rho, vect,
+         lc.refraction_or_reflection(self.rho, vect,
                                       self.tilt, self.refracted_vect,
                                       indexmatch, self.n))
         if bundle_reflect_stay == 1:  # bundle reflected back into volume
@@ -1430,7 +1430,7 @@ class TransparentBoundary(Boundary):
 
         # if this boundary has no associated interface, it is leaving the LSC
         if self.interfaces == []:
-            refracted_vect = lsc.refracted_vect_flip(self.n, self.center,
+            refracted_vect = lc.refracted_vect_flip(self.n, self.center,
                                                      self.IoR, bundle.p_o,
                                                      bundle.p_i, vect)
             index = self.index  # do not enable transfer to adjacent volume
@@ -1464,7 +1464,7 @@ class TransparentBoundary(Boundary):
                 adj_interface.IoR = adj_interface.volume.IoR.__call__(
                                                             bundle.wave_len)
             IoR_adj = adj_interface.IoR
-            refracted_vect = lsc.refracted_vect(self.IoR, IoR_adj, vect)
+            refracted_vect = lc.refracted_vect(self.IoR, IoR_adj, vect)
             index = adj_interface.index
             indexmatch = False
 
@@ -1599,16 +1599,16 @@ class OpaqueBoundary(Boundary):
         
         reset = 0
         if type(self.efficiency) is float:
-            reset = lsc.surface_efficiency(self.efficiency)
+            reset = lc.surface_efficiency(self.efficiency)
         else:
-            probability = lsc.surface_absorption(
+            probability = lc.surface_absorption(
                     bundle.wave_len, self.wave_len_min,
                     self.wave_len_max, self.efficiency)
-            reset = lsc.surface_efficiency(probability)
+            reset = lc.surface_efficiency(probability)
 
         if reset == 1:
             self.wave_len_log.append(bundle.wave_len)
-            self.nphoton += lsc.photon_generation(bundle.wave_len,
+            self.nphoton += lc.photon_generation(bundle.wave_len,
                                                   bundle.energy)
             self.bundles_absorbed += 1
             self.bundles.append(bundle)
@@ -1653,7 +1653,7 @@ class OpaqueBoundary(Boundary):
         # of a particular boundary
         vect = rm.rot(self.tilt, vect, self.n)
         # incident light vector is reflected (output is in global coordinates)
-        [theta, phi] = lsc.bundle_reflection(self.surface_type, vect,
+        [theta, phi] = lc.bundle_reflection(self.surface_type, vect,
                                              self.tilt, self.n)
 
         return [theta, phi, reset, index]
@@ -1814,15 +1814,15 @@ class PVBoundary(OpaqueBoundary):
         self.wave_len_log.append(bundle.wave_len)
         if type(self.EQE) is float:
             efficiency = self.EQE/self.IQE
-            reset = lsc.surface_efficiency(efficiency)
+            reset = lc.surface_efficiency(efficiency)
         else:
             # call EQE at a particular wavelength
-            probability_EQE = lsc.surface_absorption(bundle.wave_len,
+            probability_EQE = lc.surface_absorption(bundle.wave_len,
                                                      self.wave_len_min,
                                                      self.wave_len_max,
                                                      self.EQE)
             # call IQE at a particular wavelength
-            probability_IQE = lsc.surface_absorption(bundle.wave_len,
+            probability_IQE = lc.surface_absorption(bundle.wave_len,
                                                      self.wave_len_min,
                                                      self.wave_len_max,
                                                      self.IQE)
@@ -1831,22 +1831,22 @@ class PVBoundary(OpaqueBoundary):
                 probability = 0
             else:
                 probability = probability_EQE/probability_IQE     
-            reset = lsc.surface_efficiency(probability)
+            reset = lc.surface_efficiency(probability)
         
         # if bundle is transmitted, evaluate against IQE
         if reset == 1:
             self.bundles_absorbed += 1
             self.bundles.append(bundle)
             if type(self.IQE) is float:
-                converted = lsc.surface_efficiency(self.IQE)
+                converted = lc.surface_efficiency(self.IQE)
             else:
-                probability = lsc.surface_absorption(bundle.wave_len,
+                probability = lc.surface_absorption(bundle.wave_len,
                                                      self.wave_len_min,
                                                      self.wave_len_max,
                                                      self.IQE)
-                converted = lsc.surface_efficiency(probability)
+                converted = lc.surface_efficiency(probability)
             if converted == 1:
-                self.nphoton += lsc.photon_generation(bundle.wave_len,
+                self.nphoton += lc.photon_generation(bundle.wave_len,
                                                       bundle.energy)
                 self.bundles_converted += 1
 
@@ -1943,7 +1943,7 @@ class Bundle():
         Number of particles emitted from a particle (there can be more than 1
                                                      in a single simulation)
     energy : float
-        Incident solar radiation divided by number of simulations. This is the
+        Incident solar radiation divided by number of trials. This is the
         energy of a single bundle.
     nphoton : float
         Number of photons in a bundle
@@ -1970,18 +1970,18 @@ class Bundle():
         self.mag_trav = mag_trav
         self.path_progress = path_progress
         self.p_i = p_o
-        self.wave_len = lsc.xenon_spectrum(self.spectrum, self.spectrum_max)
-        self.pathlength = lsc.pathlength_matrix(self.wave_len,
+        self.wave_len = lc.xenon_spectrum(self.spectrum, self.spectrum_max)
+        self.pathlength = lc.pathlength_matrix(self.wave_len,
                                                 self.volume.wave_len_min,
                                                 self.volume.wave_len_max,
                                                 self.volume.absorption)
-        self.particle_pathlength = pm.pathlength(particle.extinction)
+        self.particle_pathlength = pc.pathlength(particle.extinction)
         self.reset = 0
         self.boundary_intersect_count = 0
         self.particle_intersect_count = 0
         self.particle_emission_count = 0
-        self.energy = self.I/self.volume.LSC.simulations
-        self.nphoton = lsc.photon_generation(self.wave_len, self.energy)
+        self.energy = self.I/self.volume.LSC.trials
+        self.nphoton = lc.photon_generation(self.wave_len, self.energy)
 
 
 class Particle():
@@ -2083,16 +2083,16 @@ class Particle():
         if self.wave_len_min < wave_len < self.wave_len_max:
             # find probability that a bundle is absorbed based upon normalized
             # absorption spectrum of the phosphor
-            probability = pm.absorption_spectrum(self.absorption_spect,
+            probability = pc.absorption_spectrum(self.absorption_spect,
                                                  wave_len,
                                                  self.wave_len_min,
                                                  self.wave_len_max)
             # adjust poa with spectrum value to evaluate bundle absorption
             if random.uniform(0, 1) <= self.poa*probability:
                 absorbed = 1
-                wave_len_e = pm.emission_spectrum(self.emission_spect,
+                wave_len_e = pc.emission_spectrum(self.emission_spect,
                                                   self.emission_spect_max)
-                reset = pm.quantum_efficiency(wave_len, wave_len_e, self.qe)
+                reset = pc.quantum_efficiency(wave_len, wave_len_e, self.qe)
                 if reset == 1:
                     self.bundles_absorbed += 1
                 else:

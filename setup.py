@@ -12,13 +12,12 @@ setuptools.setup(
     long_description="""
     lsclib is a python-based repository hosted on GitHub that employs the 
     Monte Carlo ray-tracing method of radiative transport to effectively model
-    LSCs.lsclib hopes to short-circuit (pun-intended)the learning curve
-    associated breaking into the field, and present results in both an academic
-    and commercial context. This repository will continue to become more
-    sophisticated, but for now relies heavily upon the paper submitted for
-    publishing entitled "An open-source Monte Carlo ray-trace simulation tool
-    for luminescent solar concentrators with validation studies employing
-    scattering phosphor films."
+    LSCs.lsclib hopes to short-circuit the learning curve associated breaking
+    into the field, and present results in both an academic and commercial 
+    context. This repository will continue to become more sophisticated, but
+    for now relies heavily upon the paper submitted for publishing entitled
+    "An open-source Monte Carlo ray-trace simulation tool for luminescent solar
+    concentrators with validation studies employing scattering phosphor films."
     """,
     long_description_content_type="text/markdown",
     url="https://github.com/duncanesmith/lsclib",

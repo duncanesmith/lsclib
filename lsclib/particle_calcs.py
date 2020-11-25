@@ -23,15 +23,12 @@ def absorption_spectrum(spectrum, wave_len, wave_len_min, wave_len_max):
     Output:
     wave_len = incident wavelength of bundle
     """
-#    start_time = time.perf_counter()
 
     probability = 0  # initialize probability of absorption
 
     if wave_len >= wave_len_min and wave_len <= wave_len_max:
         probability = spectrum.__call__(wave_len)
     
-#    end_time = time.perf_counter() - start_time
-#    print(end_time)
     return probability
 
 
@@ -48,7 +45,6 @@ def emission_spectrum(spectrum, spectrum_max):
     Output:
     wave_len = incident wavelength of bundle
     """
-#    start_time = time.perf_counter()
     
     wave_len = 0  # initialize wave_len
     # if wavelength is specified directly then use it (spectrum is wavelength)
@@ -58,9 +54,6 @@ def emission_spectrum(spectrum, spectrum_max):
     # if spectrum is specified then solve for wavelength
     else:
         wave_len = spectrum.__call__(random.uniform(0, spectrum_max))
-    
-#    end_time = time.perf_counter() - start_time
-#    print(end_time)
     
     return wave_len
 

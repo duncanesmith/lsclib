@@ -5,13 +5,12 @@ Created on Mon Mar 11 16:14:00 2019
 @author: smithd24
 """
 
-
 import math
 import time
-import xls_read_interpolate as xlsread
-import lsc_classes as lsccls
+from lsclib import xls_read_interpolate as xlsread
+from lsclib import lsc_classes as lsccls
 import cProfile, pstats
-import external_equations as eqn
+from lsclib import external_equations as eqn
 import pandas as pd
 
 def wedge(trials, Einc = 451.313, light_form = 'direct',

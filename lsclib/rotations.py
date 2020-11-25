@@ -7,7 +7,7 @@ Created on Mon Feb 18 15:56:39 2019
 
 import math
 import numpy as np
-import lsc_calcs as lsc
+from lsclib import lsc_calcs as lc
 from shapely.geometry import Polygon
 from shapely.geometry import Point
 
@@ -173,7 +173,7 @@ def rot_point(angle, point, n):
     """
     
     xvect = np.array([1,0,0])
-    frontbacktest = lsc.incidence_angle(n,xvect)
+    frontbacktest = lc.incidence_angle(n,xvect)
     # if this is a front or back surface of the LSC, rotate with respect to y
     if frontbacktest == 0 or frontbacktest == math.pi:
         point_2d = rot_point_y(angle, point)
@@ -212,7 +212,7 @@ def rot_poly(angle, polygon, n):
     """
        
     xvect = np.array([1,0,0])
-    frontbacktest = lsc.incidence_angle(n,xvect)
+    frontbacktest = lc.incidence_angle(n,xvect)
     # if this is a front or back surface of the LSC, rotate with respect to y    
     if frontbacktest == 0 or frontbacktest == math.pi:
         poly_2d = rot_poly_y(angle, polygon)

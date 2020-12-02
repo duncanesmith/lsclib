@@ -12,12 +12,12 @@ from inspect import isfunction
 import pandas as pd
 
 # import LSC specific functions
-import lsc_calcs as lc  # import lsc calcs
-import particle_calcs as pc      # import phosphor calcs
+from lsclib import lsc_calcs as lc       # import lsc calcs
+from lsclib import particle_calcs as pc  # import phosphor calcs
 
 # import transformation functions
-import rotations as rm                           # coord rotations
-from coordinate_transformations import sph2cart  # sph to cart trans
+from lsclib import rotations as rm                      # coord rotations
+from lsclib.coordinate_transformations import sph2cart  # sph to cart trans
 from shapely.geometry import Polygon
 from shapely.geometry import Point
 

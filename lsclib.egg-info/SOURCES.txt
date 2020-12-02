@@ -5,7 +5,6 @@ lsclib/coordinate_transformations.py
 lsclib/external_equations.py
 lsclib/lsc_calcs.py
 lsclib/lsc_classes.py
-lsclib/lsc_external_equations.py
 lsclib/particle_calcs.py
 lsclib/rotations.py
 lsclib/run.py

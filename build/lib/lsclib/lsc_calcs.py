@@ -9,13 +9,10 @@ Created on Mon Feb 18 10:33:32 2019
 import math         # import math functions
 import random       # import random number functions
 import numpy as np  # import numpy matrix operations
-import time
 
 # import transformation functions
-import rotations as rm
-from coordinate_transformations import sph2cart
-from coordinate_transformations import cart2sph
-
+from lsclib import rotations as rm
+from lsclib.coordinate_transformations import sph2cart, cart2sph
 
 def xenon_spectrum(spectrum, spectrum_max):
     """From the normalized incident light spectrum on an LSC, probabilistically

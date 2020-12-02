@@ -12,17 +12,17 @@ from scipy.interpolate import InterpolatedUnivariateSpline
 def excel_read():
 
     # read silicone matrix absorption spectrum data from excel
-    abs_matrix = pd.read_excel('absorption_matrix.xlsx')
+    abs_matrix = pd.read_csv('absorption_matrix.csv')
     # read pv external quantum efficiency spectrum data from excel
-    EQE_pv = pd.read_excel('eqe_pv.xlsx')
+    EQE_pv = pd.read_csv('eqe_pv.csv')
     # read pv internal quantum efficiency spectrum data from excel
-    IQE_pv = pd.read_excel('iqe_pv.xlsx')
+    IQE_pv = pd.read_csv('iqe_pv.csv')
     # read xenon emission spectrum data from excel
-    emi_source = pd.read_excel('emission_source.xlsx')
+    emi_source = pd.read_csv('emission_source.csv')
     # read phosphor absorption spectrum data from excel
-    abs_particle = pd.read_excel('absorption_particle.xlsx')    
+    abs_particle = pd.read_csv('absorption_particle.csv')    
     # read phosphor emission spectrum data from excel
-    emi_particle = pd.read_excel('emission_particle.xlsx')
+    emi_particle = pd.read_csv('emission_particle.csv')
     
     return abs_matrix, EQE_pv, IQE_pv, emi_source, abs_particle, emi_particle
 

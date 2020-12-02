@@ -24,6 +24,7 @@ setuptools.setup(
     url="https://github.com/duncanesmith/lsclib",
     packages=setuptools.find_packages(),
     include_package_data=True,
+    package_data={'': ['data/*.csv']},
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Science/Research",

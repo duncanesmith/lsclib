@@ -13,3 +13,10 @@ lsclib.egg-info/PKG-INFO
 lsclib.egg-info/SOURCES.txt
 lsclib.egg-info/dependency_links.txt
 lsclib.egg-info/top_level.txt
+lsclib/data/absorption_matrix.csv
+lsclib/data/absorption_particle.csv
+lsclib/data/emission_AM1.5.csv
+lsclib/data/emission_particle.csv
+lsclib/data/emission_source.csv
+lsclib/data/eqe_pv.csv
+lsclib/data/iqe_pv.csv

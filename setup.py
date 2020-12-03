@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="lsclib", # Replace with your own username
-    version="0.0.7",
+    version="0.1.2",
     author="Duncan E. Smith",
     author_email="smithd24@rpi.edu",
     description=("Library for evaluating the performance of LSCs"),
@@ -23,7 +23,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/duncanesmith/lsclib",
     packages=setuptools.find_packages(),
-    package_data={'': ['data/*.csv'],},
+    python_requires='>=3.6',
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Science/Research",
@@ -37,5 +37,6 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.6',
+    include_package_data=True,
+    package_data={'': ['data/*.csv']},
 )

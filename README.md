@@ -9,7 +9,7 @@ is a python-based repository hosted on GitHub that employs the Monte Carlo ray-t
 lsclib hopes to short-circuit the learning curve associated with breaking into the field, and present results in both an academic and
 commercial context. This repository will continue to become more sophisticated, but for now relies heavily upon the paper submitted for publishing
 entitled "An open-source Monte Carlo ray-trace simulation tool for luminescent solar concentrators with validation studies employing scattering phosphor films".
-Install the [lsclib package](https://pypi.org/project/lsclib/) to get started!
+Download the repository to get started!
 
 While lsclib is growing and improving, the visitor to this repository is also encouraged to visit [pvtrace](https://github.com/danieljfarrell/pvtrace). 
 lsclib has many advantages, but pvtrace is quite extensive and may be a better fit for certain applications.
@@ -29,5 +29,5 @@ see that the "lsc_classes" module is referenced frequently by the "run" module. 
 You'll see that the "lsc_calcs" module is referenced frequently by the "lsc_classes" module. These and all other modules used are commented - open the lsclib folder
 to view everything.
 
-A good line of code to get you started (once everything is installed and imported) is: "LSC = lsclib.run.wedge(1000)", which will create an LSC object with the affiliated
+Once you've downloaded the files from GitHub, navigate to the "run.py" file and run it. Then you can type "LSC = wedge(1000)", which will create an LSC object with the affiliated
 attributes produced for 1000 trials under normal insolation. For example, "LSC.Isc_cell" will report the resulting short-circuit current of the solar cell within an LSC.

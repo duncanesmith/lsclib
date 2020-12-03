@@ -19,7 +19,7 @@ def excel_read():
     # read xenon emission spectrum data from excel
     emi_source = pd.read_csv('data/emission_source.csv')
     # read phosphor absorption spectrum data from excel
-    abs_particle = pd.read_csv('data/absorption_particle.csv')    
+    abs_particle = pd.read_csv('data/absorption_particle.csv')
     # read phosphor emission spectrum data from excel
     emi_particle = pd.read_csv('data/emission_particle.csv')
     

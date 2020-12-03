@@ -11,8 +11,8 @@ import random       # import random number functions
 import numpy as np  # import numpy matrix operations
 
 # import transformation functions
-from lsclib import rotations as rm
-from lsclib.coordinate_transformations import sph2cart, cart2sph
+import rotations as rm
+from coordinate_transformations import sph2cart, cart2sph
 
 def xenon_spectrum(spectrum, spectrum_max):
     """From the normalized incident light spectrum on an LSC, probabilistically

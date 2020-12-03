@@ -7,7 +7,7 @@ Created on Mon Feb 18 15:56:39 2019
 
 import math
 import numpy as np
-from lsclib import lsc_calcs as lc
+import lsc_calcs as lc
 from shapely.geometry import Polygon
 from shapely.geometry import Point
 

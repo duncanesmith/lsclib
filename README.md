@@ -1,5 +1,7 @@
 # lsclib
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4437507.svg)](https://doi.org/10.5281/zenodo.4437507)
+
 ## Summary 
 Luminescent solar concentrators (LSCs) enhance the power output of solar cells via luminescent emission and internal reflection.
 LSCs have long been speculated as BIPV due to their innate architectural flexibility and vast potential for improvement in PV efficiency.
@@ -8,7 +10,7 @@ is a python-based repository hosted on GitHub that employs the Monte Carlo ray-t
 
 lsclib hopes to short-circuit the learning curve associated with breaking into the field, and present results in both an academic and
 commercial context. This repository will continue to become more sophisticated, but for now relies heavily upon the paper submitted for publishing
-entitled "An open-source Monte Carlo ray-trace simulation tool for luminescent solar concentrators with validation studies employing scattering phosphor films".
+entitled "An Open-source Monte Carlo Ray-Tracing Simulation Tool for Luminescent Solar Concentrators With Validation Studies Employing Scattering Phosphor Films".
 Download the repository to get started!
 
 While lsclib is growing and improving, the visitor to this repository is also encouraged to visit [pvtrace](https://github.com/danieljfarrell/pvtrace). 

@@ -74,7 +74,7 @@ def wedge(trials, Einc = 451.313, light_form = 'direct',
     Film_height = .001
     Short_side_pos = 0  # distance up from zero to the bottom point of the
                               # short side of a wedge-shaped LSC
-    Top_length = .05
+    Top_length = .03
     Mirror_gap_length = .000001
     W = .022
     precision = 16 
@@ -343,16 +343,16 @@ def wedge(trials, Einc = 451.313, light_form = 'direct',
     
     return lsc
 
-# if __name__ == '__main__':
-#     LSC_wedge_main(1000)
+if __name__ == '__main__':
+    wedge(100000)
 
-# pr = cProfile.Profile()
-# pr.enable()
-# LSC_wedge_main(1000)
-# pr.disable()
-# pr.dump_stats('prof_data')
+pr = cProfile.Profile()
+pr.enable()
+wedge(100000)
+pr.disable()
+pr.dump_stats('prof_data')
 
-# ps = pstats.Stats('prof_data')
-# ps.sort_stats(pstats.SortKey.CUMULATIVE)
+ps = pstats.Stats('prof_data')
+ps.sort_stats(pstats.SortKey.CUMULATIVE)
               
-# ps.print_stats()
+ps.print_stats()

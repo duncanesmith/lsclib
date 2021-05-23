@@ -13,8 +13,21 @@ import cProfile, pstats
 import external_equations as eqn
 import pandas as pd
 
-def wedge(trials, Einc = 451.313, light_form = 'direct',
-                   results = 'single', theta_o = .000001, phi_o = .000001):
+import math
+import time
+import xls_read_interpolate as xlsread
+import lsc_classes as lsccls
+import cProfile, pstats
+import external_equations as eqn
+import pandas as pd
+
+def wedge(trials, Einc = 1000, light_form = 'direct', results = 'single',
+          theta_o = .000001, phi_o = .000001, tilt = 90,
+          input_params = {'Height': .007, 'Film Height': .001, 
+                          'Short Side Position': .0059, 'Top Length': .03,
+                          'Mirror Gap Length': .007, 'Width': .022,
+                          'Film Concentration (kg/m^3)': 27.73}):
+    
     """Set up geometry to run trials for a wedge-shaped LSC. Specify
     vertices that make up the LSC. Each vertice will belong to a boundary and
     each boundary will belong to a volume. Using the LSC classes that have
@@ -25,14 +38,12 @@ def wedge(trials, Einc = 451.313, light_form = 'direct',
     trials : int
         Indicate number of bundles that will be used for the program
     Einc : float
-        Indicates incident irradiance on the LSC. Default is 451.313 based upon
-        the irradiance of the Newport Solar Simulator used for experiments.
+        Indicates incident irradiance on the LSC. Default is 1000 W/m2.
     light_form : string
         Determines distribution of light entering the LSC.
         'direct'  - light enters at a fixed angle
-        'diffuse' - light enters with a Lambertian distribution
-        'ground'  - light enters with a modified Lambertian distribution due to
-                    the relative angle up from the ground
+        'diffuse' - diffuse light incident from the sky
+        'ground'  - ground-reflected light incident from the ground
     results : string
         Determines if one result or if a matrix of incidence angle
         combinations is desired
@@ -42,6 +53,11 @@ def wedge(trials, Einc = 451.313, light_form = 'direct',
     phi_o : float, optional
         Initial azimuthal incidence angle. Default is zero. This is the azimuth
         angle relative to the LSC normal.
+    tilt : float
+        Tilt of LSC up from horizontal. This is input to compute the
+        distribution of diffuse and ground-reflected light (when applicable)
+    input_params : dict
+        Dictionary of main LSC inputs.
     
     Returns
     -------
@@ -70,13 +86,13 @@ def wedge(trials, Einc = 451.313, light_form = 'direct',
     
     # Initialize wedge-shaped geometry. Coordinates of individual vertices are
     # determined before they are assigned to individual boundaries.
-    Height = .007
-    Film_height = .001
-    Short_side_pos = 0  # distance up from zero to the bottom point of the
-                              # short side of a wedge-shaped LSC
-    Top_length = .03
-    Mirror_gap_length = .000001
-    W = .022
+    Height = input_params['Height']
+    Film_height = input_params['Film Height']
+    # distance up from 0 to the bottom point of the short side of the wedge
+    Short_side_pos = input_params['Short Side Position']  
+    Top_length = input_params['Top Length']
+    Mirror_gap_length = input_params['Mirror Gap Length']
+    W = input_params['Width']
     precision = 16 
     hypotenuse = math.sqrt(Short_side_pos**2 + Top_length**2)
     angle = math.acos(Top_length/hypotenuse)
@@ -102,6 +118,12 @@ def wedge(trials, Einc = 451.313, light_form = 'direct',
     
     L = Top_length
     H = Height
+    GG = L/H  # geometric gain (should eventually calculate from total PV area)
+    mc_params = input_params
+    mc_params['Geometric Gain'] = GG
+    mc_params['Light Form'] = light_form
+    mc_params['Trials'] = trials
+    df_params = pd.DataFrame(mc_params, index = [0])
     
     # read in various excel data tables
     [abs_matrix, EQE_pv, IQE_pv, emi_source,
@@ -117,8 +139,7 @@ def wedge(trials, Einc = 451.313, light_form = 'direct',
     wave_len_max = 500  # maximum wavelength that can be absorbed by a particle
     qe = 0.75           # quantum efficiency of a particle
     poa = .2            # probability of particle absorption (exp. value)
-    extinction = 4240   # extinction coefficient (42.4 cm^-1)
-    
+    extinction = 152.9*input_params['Film Concentration (kg/m^3)']
     
     # establish matrix characteristics
     IoR = eqn.IoR_Sellmeier    # set index of refraction as constant or eqn
@@ -141,13 +162,39 @@ def wedge(trials, Einc = 451.313, light_form = 'direct',
                 45:  [0, 0, 0, 0, 0, 0],
                 60:  [0, 0, 0, 0, 0, 0],
                 75:  [0, 0, 0, 0, 0, 0],
-                89.999:  [0, 0, 0, 0, 0, 0]} 
+                89.999:  [0, 0, 0, 0, 0, 0],
+                105: [0, 0, 0, 0, 0, 0],
+                120: [0, 0, 0, 0, 0, 0],
+                135: [0, 0, 0, 0, 0, 0],
+                150: [0, 0, 0, 0, 0, 0],
+                165: [0, 0, 0, 0, 0, 0],
+                180: [0, 0, 0, 0, 0, 0],} 
         
         # Convert the dictionary into DataFrame 
         df = pd.DataFrame(data)
         df.set_index('', inplace = True)
+        df_oe = pd.DataFrame(data)
+        df_oe.set_index('', inplace = True)
+        df_m = pd.DataFrame(data)
+        df_m.set_index('', inplace = True)
         theta_loop_count = len(df.index)
         phi_loop_count = len(df.columns)
+    
+    # if running a combination of many theta_o and phi_o
+    if light_form != 'direct' and results == 'matrix':
+        
+        data = {'tilt': [ 5, 10, 20, 30, 40, 50, 60, 70, 80, 90], 
+                'lsc_objects': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
+        
+        df = pd.DataFrame(data)
+        df.set_index('tilt', inplace = True)
+        df_oe = pd.DataFrame(data)
+        df_oe.set_index('tilt', inplace = True)
+        df_m = pd.DataFrame(data)
+        df_m.set_index('tilt', inplace = True)
+        
+        theta_loop_count = len(df.index)
+        phi_loop_count = 1
     
     # if expecting just one combination of inputs
     if results == 'single':
@@ -274,17 +321,21 @@ def wedge(trials, Einc = 451.313, light_form = 'direct',
                 theta_o = df.index[i]
                 phi_o = df.columns[j]
                 
+            if light_form != 'direct' and results == 'matrix':
+                tilt = df.index[i]
+                
             lsc.matching_pairs()    
             I = Einc*math.cos(math.radians(theta_o))*(L*W)
             theta_o = math.radians(theta_o + 180)  # adjust theta to head down
             phi_o = math.radians(phi_o + 90)       # adjust phi
+            tilt = math.radians(tilt)              # adjust tilt
             
             # Run LSC trials, determining fate of every bundle
             starting_vol = len(lsc) - 1
             starting_bdy = 2
             
             lsc.main(trials, L, W, H, light_form, theta_o,
-                     phi_o, starting_vol, starting_bdy, I,
+                     phi_o, tilt, starting_vol, starting_bdy, I,
                      emi_source, emi_source_max, particle)
             
             # Process data outputs from all LSC trials
@@ -328,31 +379,37 @@ def wedge(trials, Einc = 451.313, light_form = 'direct',
             if error != 1:
                 print("\nENERGY IS NOT CONSERVED!!!!!")
 
-            if results == 'matrix':
+            if light_form == 'direct' and results == 'matrix':
                 df.iloc[i,j] = lsc
+                df_oe.iloc[i,j] = lsc.optical_efficiency
+                df_m.iloc[i,j] = lsc.m
+            
+            if light_form != 'direct' and results == 'matrix':
+                df.iloc[i,0] = lsc
+                df_oe.iloc[i,0] = lsc.optical_efficiency
+                df_m.iloc[i,0] = lsc.m
     
     if results == 'matrix':
-        writer = pd.ExcelWriter('LSC_data.xlsx')
-        df.to_excel(writer,'Sheet1')
-        writer.save()
-        lsc = df
+        df_params.to_csv('mc_params.csv')
+        lsc_outputs = {'parameters': mc_params,'opt_eff': df_oe,
+                       'spect_mismatch':df_m, 'object':df,}
+        if light_form =='direct':
+            df_oe.to_csv('opt_eff_beam_circ.csv')
+            df_m.to_csv('spect_mismatch_beam_circ.csv')
+        if light_form =='diffuse':
+            df_oe.to_csv('opt_eff_iso.csv')
+            df_m.to_csv('spect_mismatch_iso.csv')
+        if light_form =='ground':
+            df_oe.to_csv('opt_eff_grnd.csv')
+            df_m.to_csv('spect_mismatch_grnd.csv')    
+        
     else:
         print(time.time() - start_time)
         print(light_form)
         print(lsc.optical_efficiency)
+        print(lsc.m)
+        print(tilt)
+        lsc_outputs = {'parameters': mc_params,'opt_eff': lsc.optical_efficiency,
+                       'spect_mismatch':lsc.m, 'object':lsc}
     
-    return lsc
-
-if __name__ == '__main__':
-    wedge(100000)
-
-pr = cProfile.Profile()
-pr.enable()
-wedge(100000)
-pr.disable()
-pr.dump_stats('prof_data')
-
-ps = pstats.Stats('prof_data')
-ps.sort_stats(pstats.SortKey.CUMULATIVE)
-              
-ps.print_stats()
+    return lsc_outputs

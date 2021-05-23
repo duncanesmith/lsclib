@@ -14,6 +14,61 @@ import numpy as np  # import numpy matrix operations
 import rotations as rm
 from coordinate_transformations import sph2cart, cart2sph
 
+
+def incident_diffuse(tilt, light_form):
+    """Determine incident direction for diffuse or ground-reflected light by
+    sampling a diffuse distribution limited by the sky view factor.
+    
+    Parameters
+    ----------
+    tilt : float
+        Angle relative to the xy plane
+    light_form : string
+        'diffuse' - diffuse light incident
+        'ground' - ground-reflected light incident
+    
+    Returns
+    -------
+    theta : float
+        Sampled polar incidence angle incident on LSC
+    phi : float
+        Sampled azimuthal incidence angle incident on LSC
+    
+    Notes
+    -----
+    """
+    
+    i=0
+    # if tilt is equal to zero, no ground-reflected light should reach a cell
+    if tilt==0 and light_form == 'ground':
+        theta = 0
+        phi = 0
+        i+=1
+    # sample from diffuse distribution accounting for bounds of possible theta/phi
+    while i==0:
+        # generate random numbers based on lambertian distribution
+        theta_rand = math.asin(math.sqrt(random.uniform(0, 1)))
+        phi_rand = 2 * math.pi * random.uniform(0, 1)
+        # process bounds for diffuse light
+        if light_form == 'diffuse':
+            if (((theta_rand >= 0 and theta_rand <= math.pi/2) and
+                  (phi_rand >= 0 and phi_rand <= math.pi)) or
+                ((theta_rand >= 0 and theta_rand <= (math.pi/2 - tilt) and 
+                  (phi_rand >= math.pi and phi_rand <= 2*math.pi)))):
+                i+=1      
+        # process bounds for ground-reflected light
+        if light_form == 'ground':   
+            if ((theta_rand >= (math.pi/2 - tilt) and theta_rand <= math.pi/2) and 
+                 (phi_rand >= math.pi and phi_rand <= 2*math.pi)):
+                i+=1
+        # rotate vector into coordinate system of LSC
+        vect = sph2cart(theta_rand, phi_rand)
+        vect = rm.rot(math.pi, vect, np.array([0,1,0]))
+        [theta, phi] = cart2sph(vect)
+    
+    return theta, phi
+
+
 def xenon_spectrum(spectrum, spectrum_max):
     """From the normalized incident light spectrum on an LSC, probabilistically
     determine an individual wavelength.

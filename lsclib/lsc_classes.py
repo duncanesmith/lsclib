@@ -8,7 +8,6 @@ Created on Wed Mar  6 15:48:05 2019
 import math         # import math functions
 import random       # import random number functions
 import numpy as np  # import numpy matrix operations
-from inspect import isfunction
 import pandas as pd
 
 # import LSC specific functions
@@ -18,8 +17,6 @@ import particle_calcs as pc  # import phosphor calcs
 # import transformation functions
 import rotations as rm                      # coord rotations
 from coordinate_transformations import sph2cart  # sph to cart trans
-from shapely.geometry import Polygon
-from shapely.geometry import Point
 
 
 class LSC():
@@ -258,7 +255,7 @@ class LSC():
                             self.gateways[gateway].matchingcenter = (
                                                 self.gateways[gateway].center)
 
-    def main(self, trials, L, W, H, light_form, theta_o, phi_o,
+    def main(self, trials, L, W, H, light_form, theta_o, phi_o, tilt,
              starting_vol, starting_bdy, I, emi_xenon, emi_xenon_max, particle):
         """Processes bundle movement between volumes and calculates a variety
         of LSC attributes based upon bundle fates (simulation results)
@@ -329,15 +326,9 @@ class LSC():
             # incz = random.uniform(0,H)  # random location in z
             # p_o = [incx, L, incz]       # create first point
             
-            if light_form == 'diffuse':
-                theta_o = math.asin(math.sqrt(random.uniform(0, 1)))
-                theta_o = math.pi + theta_o
-                phi_o = 2*math.pi*random.uniform(0, 1)
-            
-            if light_form == 'ground':
-                theta_o = math.asin(math.sqrt(random.uniform(0, 1)))
-                theta_o = math.pi + theta_o
-                phi_o = -math.pi*random.uniform(0, 1)
+            # randomly sample from diffuse or ground-reflected distribution
+            if (light_form == 'diffuse' or light_form == 'ground'):
+                theta_o, phi_o = lc.incident_diffuse(tilt, light_form)
             
             bundle = Bundle(theta_o, phi_o, I, emi_xenon, emi_xenon_max,
                             p_o, self[starting_vol], particle)

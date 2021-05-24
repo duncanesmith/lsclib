@@ -15,9 +15,31 @@ import rotations as rm
 import math
 
 
-# data = 'data/78206_33.45_-112.06_tmy-2019.csv' # Phoenix data file
-data = 'data/1252757_42.65_-73.74_tmy-2019.csv' # Albany data file
-[metadata, TMYData] = pvlib.iotools.read_psm3(data)
+# Import weather data
+weather_data = 'data/1252757_42.65_-73.74_tmy-2019.csv' # Albany data file
+[metadata, TMYData] = pvlib.iotools.read_psm3(weather_data)
+
+# Import existing LSC optical efficiencies
+opt_eff_beam_circ = pd.read_csv(
+    'data/wedge_lsc/opt_eff_beam_circ.csv', index_col = 0)
+opt_eff_iso = pd.read_csv(
+    'data/wedge_lsc/opt_eff_iso.csv', index_col = 0)
+opt_eff_grnd = pd.read_csv(
+    'data/wedge_lsc/opt_eff_grnd.csv', index_col = 0)
+opt_eff = [opt_eff_beam_circ, opt_eff_iso, opt_eff_grnd]
+
+# Import existing spectral mismatch factors
+spect_mismatch_beam_circ = pd.read_csv(
+    'data/wedge_lsc/spect_mismatch_beam_circ.csv', index_col = 0)
+spect_mismatch_iso = pd.read_csv(
+    'data/wedge_lsc/spect_mismatch_iso.csv', index_col = 0)
+spect_mismatch_grnd = pd.read_csv(
+    'data/wedge_lsc/spect_mismatch_grnd.csv', index_col = 0)
+spect_mismatch = [spect_mismatch_beam_circ, spect_mismatch_iso,
+                  spect_mismatch_grnd]
+
+# compute geometric gain using corresponding geometry
+geometric_gain = .03/.007
 
 def forecast_lsc(TMYData, metadata, DC_size, geometric_gain, opt_eff,
                  spect_mismatch, surface_tilt = 90, surface_azimuth = 180,
@@ -162,8 +184,8 @@ def forecast_lsc(TMYData, metadata, DC_size, geometric_gain, opt_eff,
     L = 1.640  # m
     W = 0.992  # m
     alpha_sc = .005  # A/C
-    gamma_ref = .910 #-0.00400  # 1/K - maybe %?
-    mu_gamma =-.00038  # 1/K - maybe %?
+    gamma_ref = .910 # 1/K
+    mu_gamma =-.00038  # 1/K
     I_L_ref = 9.9  # A
     I_o_ref = 1.8E-11  # A
     R_sh_ref = 1700  # ohm

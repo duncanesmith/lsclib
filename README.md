@@ -7,14 +7,16 @@ Luminescent solar concentrators (LSCs) enhance the power output of solar cells v
 LSCs have long been speculated as BIPV due to their innate architectural flexibility and vast potential for improvement in PV efficiency.
 However, it is more difficult to model LSCs as compared with solar panels, and this has limited their integration commercially. lsclib
 is a python-based repository hosted on GitHub that employs the Monte Carlo ray-tracing method of radiative transport to effectively model LSCs.
+Additionally, the Monte Carlo code found here can be used to generate inputs for LSC energy estimates.
 
 lsclib hopes to short-circuit the learning curve associated with breaking into the field, and present results in both an academic and
-commercial context. This repository will continue to become more sophisticated, but for now relies heavily upon the paper submitted for publishing
-entitled "An Open-source Monte Carlo Ray-Tracing Simulation Tool for Luminescent Solar Concentrators With Validation Studies Employing Scattering Phosphor Films".
+commercial context. This repository will continue to become more sophisticated, but for now relies heavily upon the paper entitled: 
+"An Open-source Monte Carlo Ray-Tracing Simulation Tool for Luminescent Solar Concentrators With Validation Studies Employing Scattering Phosphor Films".
+This paper can be [found on MDPI](https://www.mdpi.com/1996-1073/14/2/455).
 Download the repository to get started!
 
 While lsclib is growing and improving, the visitor to this repository is also encouraged to visit [pvtrace](https://github.com/danieljfarrell/pvtrace). 
-lsclib has many advantages, but pvtrace is quite extensive and may be a better fit for certain applications.
+lsclib has many advantages, but pvtrace is quite extensive and may be a better fit for certain applications. One primary distinction, however, is that the Monte Carlo tool found here will generate data necessary to compute annual energy estimates for LSCs, relying on functions found primarily in [pvlib python](https://pvlib-python.readthedocs.io/en/stable/). The recently submitted paper, "Towards a Standard Approach for Annual Energy Production of Concentrator-based Building-integrated Photovoltaics" describes the approach used to run energy estimates relying upon pvlib.
 	
 ## Requirements
 To ensure that lsclib can run properly, the first thing you'll want to do is ensure you have installed the required packages seen below.
@@ -32,4 +34,4 @@ You'll see that the "lsc_calcs" module is referenced frequently by the "lsc_clas
 to view everything.
 
 Once you've downloaded the files from GitHub, navigate to the "run.py" file and run it. Then you can type "LSC = wedge(1000)", which will create an LSC object with the affiliated
-attributes produced for 1000 trials under normal insolation. For example, "LSC.Isc_cell" will report the resulting short-circuit current of the solar cell within an LSC.
+attributes produced for 1000 trials under normal insolation. For example, "LSC.Isc_cell" will report the resulting short-circuit current of the solar cell within an LSC. The "energy_estimate.py" file will run energy estimates for both LSCs (forecast_lsc) and solar panels (forecast_solar_panel) as well. Existing csv files for LSC optical efficiency and spectral mismatch factor can be leveraged, or recreated by running a matrix of results through the Monte Carlo code.

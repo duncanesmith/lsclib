@@ -1,6 +1,6 @@
 # lsclib
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4437507.svg)](https://doi.org/10.5281/zenodo.4437507)
+[![DOI](https://zenodo.org/badge/313684595.svg)](https://zenodo.org/badge/latestdoi/313684595)
 
 ## Summary 
 Luminescent solar concentrators (LSCs) enhance the power output of solar cells via luminescent emission and internal reflection.

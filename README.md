@@ -16,7 +16,7 @@ This paper can be [found on MDPI](https://www.mdpi.com/1996-1073/14/2/455).
 Download the repository to get started!
 
 While lsclib is growing and improving, the visitor to this repository is also encouraged to visit [pvtrace](https://github.com/danieljfarrell/pvtrace). 
-lsclib has many advantages, but pvtrace is quite extensive and may be a better fit for certain applications. One primary distinction, however, is that the Monte Carlo tool found here will generate data necessary to compute annual energy estimates for LSCs, relying on functions found primarily in [pvlib python](https://pvlib-python.readthedocs.io/en/stable/). The recently submitted paper, "Towards a Standard Approach for Annual Energy Production of Concentrator-based Building-integrated Photovoltaics" describes the approach used to run energy estimates relying upon pvlib.
+lsclib has many advantages, but pvtrace is quite extensive and may be a better fit for certain applications. One primary distinction, however, is that the Monte Carlo tool found here will generate data necessary to compute annual energy estimates for LSCs, relying on functions found primarily in [pvlib python](https://pvlib-python.readthedocs.io/en/stable/). The recently published paper in [Renewable Energy](https://www.sciencedirect.com/science/article/abs/pii/S0960148121018759?via%3Dihub), "Towards a Standard Approach for Annual Energy Production of Concentrator-based Building-integrated Photovoltaics" describes the approach used to run energy estimates relying upon pvlib.
 	
 ## Requirements
 To ensure that lsclib can run properly, the first thing you'll want to do is ensure you have installed the required packages seen below.

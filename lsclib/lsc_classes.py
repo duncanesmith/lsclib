@@ -18,6 +18,9 @@ import particle_calcs as pc  # import phosphor calcs
 import rotations as rm                      # coord rotations
 from coordinate_transformations import sph2cart  # sph to cart trans
 
+# import machine epsilon
+import sys
+eps = sys.float_info.epsilon
 
 class LSC():
     """
@@ -390,7 +393,7 @@ class LSC():
             # prepare inputs for individual and aggregate m calculation
             energy_cell[pv] = (
                 bundle.energy*self.pv_boundaries[pv].bundles_absorbed)
-            flux_cell_norm = self.pv_boundaries[pv].nphoton/energy_cell[pv]
+            flux_cell_norm = self.pv_boundaries[pv].nphoton/(energy_cell[pv] + eps)
             energy_i = bundle.energy*trials
             flux_bare_norm[pv] = (
                 self.pv_boundaries[pv].nphoton_bare/energy_i)
@@ -401,24 +404,27 @@ class LSC():
             # sum total photons for aggregate m calculation
             total_photons_cell += self.pv_boundaries[pv].nphoton
             total_photons_i[pv] = self.pv_boundaries[pv].nphoton_bare
-            
+
             # find incident wavelengths for each individual pv boundary
             pv_inc_spectrum = pv_inc_spectrum.append(
                                         self.pv_boundaries[pv].wave_len_log)
         
         # determine total m and other LSC performance metrics
-        total_flux_cell_norm = total_photons_cell/(sum(energy_cell))
+        total_flux_cell_norm = total_photons_cell/(sum(energy_cell) + eps)
         total_flux_bare_norm = (
-            sum(flux_bare_norm*energy_cell))/(sum(energy_cell))
-        self.m = total_flux_cell_norm/total_flux_bare_norm
+            sum(flux_bare_norm*energy_cell))/(sum(energy_cell) + eps)
+        self.m = total_flux_cell_norm/(total_flux_bare_norm + eps)
         self.Isc_cell = total_photons_cell*1.60217662E-19
         self.Isc_i = ((sum(total_photons_i*energy_cell))
-                         /(sum(energy_cell)))*1.60217662E-19
+                         /(sum(energy_cell) + eps))*1.60217662E-19
         self.optical_efficiency = sum(energy_cell)/energy_i
-        
+
         # determine normalized spectrum incident on pv
-        self.norm_inc_spectrum_pv = self.bdy_incident_spectrum(pv_inc_spectrum,
-                                                               bundle.energy)
+        if len(pv_inc_spectrum.columns) == 0:
+            self.norm_inc_spectrum_pv = None
+        else:
+            self.norm_inc_spectrum_pv = self.bdy_incident_spectrum(pv_inc_spectrum,
+                                                                   bundle.energy)
 
     
     def bare_photon_flux(self, bundle):

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<params>
+  <sim_params>
+    <nsamples>100</nsamples>
+    <nbundles>10000</nbundles>
+    <hostcluster>slurm</hostcluster>
+    <clusterscale>100</clusterscale>
+    <cores>40</cores>
+    <processes>15</processes>
+    <light_forms>direct,diffuse,ground</light_forms>
+    <geometry>wedge_no_mirror</geometry>
+  </sim_params>
+
+  <insolation_params>
+    <direct_ranges>
+      <phi>0.001,15,30,45,60,75</phi>
+      <theta>0,15,30,45,60,75,89.999,105,120,135,150,165,180</theta>
+    </direct_ranges>
+    <diffuse_ranges>
+      <tilt>5,10,20,30,40,50,60,70,80,90</tilt>
+    </diffuse_ranges>
+  </insolation_params>
+
+  <lsc_params>
+    <length>
+      <lbound>0.01</lbound>
+      <ubound>0.1</ubound>
+      <increment></increment>
+      <fidelity></fidelity>
+      <sval></sval>
+      <unit>cm</unit>
+    </length>
+    <film_concentration>
+      <lbound>0</lbound>
+      <ubound>50</ubound>
+      <increment></increment>
+      <fidelity></fidelity>
+      <sval></sval>
+      <unit>mg/ml</unit>
+    </film_concentration>
+    <short_side_height>
+      <lbound>0</lbound>
+      <ubound>0.0059</ubound>
+      <increment></increment>
+      <fidelity></fidelity>
+      <sval></sval>
+      <unit>cm</unit>
+    </short_side_height>
+  </lsc_params>
+
+  <lsc_consts>
+    <width>
+      <const>1</const>
+      <unit>mm</unit>
+    </width>
+    <mirror_gap>
+      <const>0.007</const>
+      <unit>m</unit>
+    </mirror_gap>
+    <height>
+      <const>0.007</const>
+      <unit>m</unit>
+    </height>
+    <film_thickness>
+      <const>0.001</const>
+      <unit>m</unit>
+    </film_thickness>
+  </lsc_consts>
+</params>

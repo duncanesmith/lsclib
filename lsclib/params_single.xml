@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<params>
+  <sim_params>
+    <nsamples>1</nsamples>
+    <nbundles>1000</nbundles>
+    <hostcluster>local</hostcluster>
+    <clusterscale></clusterscale>
+    <cores></cores>
+    <processes></processes>
+    <light_form>direct</light_form>
+    <geometry>wedge_no_mirror</geometry>
+  </sim_params>
+
+  <lsc_params>
+    <length>
+      <lbound>0.01</lbound>
+      <ubound>0.1</ubound>
+      <increment></increment>
+      <fidelity></fidelity>
+      <sval></sval>
+      <unit>cm</unit>
+    </length>
+    <film_concentration>
+      <lbound>0</lbound>
+      <ubound>50</ubound>
+      <increment></increment>
+      <fidelity></fidelity>
+      <sval></sval>
+      <unit>mg/ml</unit>
+    </film_concentration>
+    <short_side_height>
+      <lbound>0</lbound>
+      <ubound>0.0059</ubound>
+      <increment></increment>
+      <fidelity></fidelity>
+      <sval></sval>
+      <unit>cm</unit>
+    </short_side_height>
+  </lsc_params>
+
+  <lsc_consts>
+    <width>
+      <const>1</const>
+      <unit>mm</unit>
+    </width>
+    <mirror_gap>
+      <const>0.007</const>
+      <unit>m</unit>
+    </mirror_gap>
+    <height>
+      <const>0.007</const>
+      <unit>m</unit>
+    </height>
+    <film_thickness>
+      <const>0.001</const>
+      <unit>m</unit>
+    </film_thickness>
+  </lsc_consts>
+</params>

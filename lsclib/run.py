@@ -786,7 +786,7 @@ def wedge2(trials, Einc=1000, light_form='direct', results='single',
 
     return lsc_outputs
 
-if __name__ == "__main__":
+#if __name__ == "__main__":
     #lsc_outputs=wedge(100,theta_o=60,phi_o=0.001)
     #lsc_outputs = wedge(100, theta_o=0.001, phi_o=0.001)
     #lsc_outputs = wedge(10000, phi_o=0.001, theta_o=180)

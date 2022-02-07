@@ -712,43 +712,28 @@ def wedge2(trials, Einc=1000, light_form='direct', results='single',
 
             # Process data outputs from all LSC trials
 
-            # determine if all bundles in volume 0 are accounted for
-            errorcount0 = (lsc[0].bundles_absorbed +
-                           lsc[0][0].bundles_absorbed +
-                           lsc[0][1].bundles_reflected +
-                           lsc[0][1].bundles_refracted +
-                           lsc[0][2].bundles_reflected +
-                           lsc[0][2].bundles_refracted +
-                           lsc[0][3].bundles_absorbed +
-                           lsc[0][4].bundles_absorbed +
-                           lsc[0][5].bundles_absorbed)
+            # determine if all bundles are accounted for
+            bundle_count = particle.bundles_absorbed
+            for vol_num in range(len(lsc)):
+                try:
+                    bundle_count = bundle_count + lsc[vol_num].bundles_absorbed
+                except:
+                    pass
+                for bound_num in range(len(lsc[vol_num])):
+                    try:
+                        bundle_count = bundle_count + lsc[vol_num][bound_num].bundles_absorbed
+                    except:
+                        pass
+                    try:
+                        bundle_count = bundle_count + lsc[vol_num][bound_num].bundles_reflected
+                    except:
+                        pass
+                    try:
+                        bundle_count = bundle_count + lsc[vol_num][bound_num].bundles_refracted
+                    except:
+                        pass
 
-            # determine if all bundles in volume 1 are accounted for
-            errorcount1 = (lsc[1].bundles_absorbed +
-                           lsc[1][0].bundles_absorbed +
-                           lsc[1][1].bundles_absorbed +
-                           lsc[1][2].bundles_reflected +
-                           lsc[1][2].bundles_refracted +
-                           lsc[1][3].bundles_reflected +
-                           lsc[1][3].bundles_refracted +
-                           lsc[1][4].bundles_absorbed +
-                           lsc[1][5].bundles_absorbed +
-                           particle.bundles_absorbed)
-
-            # determine if all bundles in volume 2 are accounted for
-            errorcount2 = (lsc[2].bundles_absorbed +
-                           lsc[2][0].bundles_reflected +
-                           lsc[2][0].bundles_refracted +
-                           lsc[2][1].bundles_absorbed +
-                           lsc[2][2].bundles_reflected +
-                           lsc[2][2].bundles_refracted +
-                           lsc[2][3].bundles_absorbed +
-                           lsc[2][4].bundles_absorbed +
-                           lsc[2][5].bundles_absorbed)
-
-            error = (errorcount0 + errorcount1 + errorcount2) / trials
-
-            if error != 1:
+            if bundle_count / trials != 1:
                 print("\nENERGY IS NOT CONSERVED!!!!!")
 
             if light_form == 'direct' and results == 'matrix':
